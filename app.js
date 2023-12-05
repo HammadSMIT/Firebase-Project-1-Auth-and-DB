@@ -1,7 +1,7 @@
 
 
  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
- import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
+ import { getFirestore, query, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc , where , orderBy , limit } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
  
  
@@ -17,8 +17,12 @@
  
  const app = initializeApp(firebaseConfig);
  const auth = getAuth(app);
+//  const provider = new GoogleAuthProvider(app);
+//  auth.languageCode = 'en';
  const db = getFirestore(app);
  const ids = []  
+
+
  
  // ======== TODO =========
  
@@ -29,6 +33,8 @@
      const docRef = await addDoc(collection(db, "todos"), {
          Task: Getinp.value,
          Time: new Date().toLocaleString(),
+         population: Math.random() * 22222
+         
      });
      Getinp.value = '';
  
@@ -44,9 +50,12 @@
  
  function getData() {
      let ul = document.querySelector("#getul");
+     const data1 = collection(db, 'todos')
  
-     
-     onSnapshot(collection(db, 'todos'), (data) => {
+     if(ul){
+     onSnapshot(query(data1, where("status" , "==" ,  "inactive") ,limit() ), (data) => {
+
+    //  onSnapshot(query(data1,orderBy("Time" , "desc")), (data) => {
          data.docChanges().forEach((newData) => {
  
              ids.push(newData.doc.id)
@@ -69,6 +78,7 @@
          })
      })
  
+    }
  }
  
  getData();
@@ -106,6 +116,7 @@
  
  }
 
+ 
  // ====== Authentication ======
 
  let btn = document.querySelector("#Sbtn")
@@ -185,10 +196,13 @@ if(btn1){
 // =============== logout =================
 
 let logoutbtn = document.querySelector("#LObtn")
+
+if(logoutbtn){
 logoutbtn.addEventListener("click", () => {
     localStorage.clear()
     location.href = "./signup.html"
 })
+}
 
  
  // ========= WINDOW ===========
@@ -303,3 +317,26 @@ else{
 
 window.signin = signin
 window.signup = signup
+
+
+// let google = document.querySelector(".google");
+// if (google){
+ 
+//        google.addEventListener('click', () => {
+     
+//          signInWithPopup(auth, provider)
+//            .then((result) => {
+//              const credential = GoogleAuthProvider.credentialFromResult(result);
+//              const user = result.user;
+//              console.log(result);
+//              window.location = "./todo.html"
+     
+//            }).catch((error) => {
+//              const errorCode = error.code;
+//              const errorMessage = error.message;
+//              console.log(errorCode)
+     
+//            });
+     
+//        });
+//      }
